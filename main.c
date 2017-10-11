@@ -1,6 +1,6 @@
 /* file:	main.c													*/
-/* authors:	Jurrian de Boer (j.h.d.de.boer@student.rug.nl			*/
-/* 			Max Verbeek (email moet je zelf even toevoegen)			*/
+/* authors:	Jurrian de Boer     j.h.d.de.boer@student.rug.nl		*/
+/* 			Max Verbeek         m.j.verbeek.2@student.rug.nl		*/
 /* date:	11-10-17												*/
 /* version:	1.0														*/
 /* description:														*/
@@ -8,11 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <time.h>
 
-#if 1 /*0 for assertions on, 1 for assertions off*/
-	#define NDEBUG
-#endif
 #include <assert.h>
 
 #define NUMBLOCKS 5
@@ -81,6 +79,6 @@ int main(int argc, char *argv[]) {
 	
 	free(blocks);
 	free(testChrom);
-	
+
 	return 0;
 }
