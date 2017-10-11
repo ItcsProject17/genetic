@@ -19,7 +19,7 @@
 // number of blocks in the input set
 #define CHROMLENGTH NUMBLOCKS
 //length of chromosome
-#define POPSIZE 10;
+#define POPSIZE 10
 //number of chromosomes in population
 
 
