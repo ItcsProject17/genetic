@@ -1,12 +1,14 @@
-/* file:	skeleton.c												*/
-/* author:	Jurrian (j.h.d.de.boer@student.rug.nl)					*/
-/* date:	06-09-17												*/
+/* file:	main.c													*/
+/* authors:	Jurrian de Boer (j.h.d.de.boer@student.rug.nl			*/
+/* 			Max Verbeek (email moet je zelf even toevoegen)			*/
+/* date:	11-10-17												*/
 /* version:	1.0														*/
 /* description:														*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #if 1 /*0 for assertions on, 1 for assertions off*/
 	#define NDEBUG
@@ -15,7 +17,7 @@
 
 #define NUMBLOCKS 5
 // number of blocks in the input set
-#define CHROMLENGTH numBlocks;
+#define CHROMLENGTH NUMBLOCKS
 //length of chromosome
 #define POPSIZE 10;
 //number of chromosomes in population
@@ -43,17 +45,42 @@ void readBlocks(int **blocks, int numBlocks){
 	
 }
 
+/* Expects an integer length and returns a pointer to an array with that length
+ * filled with random booleans. */
+int *createChromosome(int length){
+	int *chromosome;
+	chromosome = safeMalloc(length*sizeof(int));
+	
+	srand(time(NULL)); // random seed
+	for (int i=0; i<length; i++){
+		chromosome[i] = ( rand() > (RAND_MAX / 2) ); // random boolean
+	}
+	
+	return chromosome;
+}
+
+/* Debugging function */
+void printArray(int *array, int length){
+	printf("array:\n");
+	for (int i=0; i<length; i++){
+		printf("%d ", array[i]);
+	}
+	printf("\n");
+}
 
 int main(int argc, char *argv[]) {
 	int *blocks;
 	readBlocks(&blocks, NUMBLOCKS);
 	
-	// Print blocksizes for later debugging
-	printf("Blocks:\n");
-	for (int i; i<NUMBLOCKS; i++){
-		printf("%d ", blocks[i]);
-	}
-	printf("\n");
+	int *testChrom;
+	testChrom = createChromosome(CHROMLENGTH);
+	
+	// Print blocksizes and chromosome for later debugging
+	printArray(blocks, NUMBLOCKS);
+	printArray(testChrom, CHROMLENGTH);
+	
+	free(blocks);
+	free(testChrom);
 	
 	return 0;
 }
