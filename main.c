@@ -13,6 +13,14 @@
 #endif
 #include <assert.h>
 
+#define NUMBLOCKS 5
+// number of blocks in the input set
+#define CHROMLENGTH numBlocks;
+//length of chromosome
+#define POPSIZE 10;
+//number of chromosomes in population
+
+
 /* Memory allocating function which indicates it if it fails.*/
 void *safeMalloc(int n) {
     void *p = malloc(n);
@@ -23,16 +31,13 @@ void *safeMalloc(int n) {
     return p;
 }
 
-/* Expects a pointer to an array and a pointer to an integer. Scans for an 
- * integer n determining the amount of blocks followed by n integers indicating 
- * the sizes of each block. Stores the amount of blocks and the sizes in 
- * the inputted pointer locations.*/
-void readBlocks(int **blocks, int *numBlocks){
-	scanf("%d", numBlocks);
+/* Expects a pointer to an array and an integer n containing the amount of blocks. 
+ * Scans for n integers indicating the sizes of each block. Stores the blocksizes
+ * at the location of the inputted pointer */
+void readBlocks(int **blocks, int numBlocks){
+	*blocks = safeMalloc(numBlocks * sizeof(int));
 	
-	*blocks = safeMalloc(*numBlocks * sizeof(int));
-	
-	for (int i=0; i<*numBlocks; i++){
+	for (int i=0; i<numBlocks; i++){
 		scanf("%d", (*blocks+i));
 	}
 	
@@ -41,7 +46,14 @@ void readBlocks(int **blocks, int *numBlocks){
 
 int main(int argc, char *argv[]) {
 	int *blocks;
-	int numBlocks;
-	readBlocks(&blocks, &numBlocks);
-	printf("numBlocks: %d\nblocks[1-3]: %d %d %d\n", numBlocks, blocks[0], blocks[1], blocks[2]); // debug statement
+	readBlocks(&blocks, NUMBLOCKS);
+	
+	// Print blocksizes for later debugging
+	printf("Blocks:\n");
+	for (int i; i<NUMBLOCKS; i++){
+		printf("%d ", blocks[i]);
+	}
+	printf("\n");
+	
+	return 0;
 }
