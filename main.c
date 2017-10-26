@@ -1,7 +1,7 @@
 /* file:	main.c													*/
 /* authors:	Jurrian de Boer     j.h.d.de.boer@student.rug.nl		*/
 /* 			Max Verbeek         m.j.verbeek.2@student.rug.nl		*/
-/* date:	11-10-17												*/
+/* date:	26-10-17												*/
 /* version:	1.0														*/
 /* description:														*/
 
@@ -25,7 +25,7 @@
 // The array of blocks
 int *blocks;
 
-/* Memory allocating function which indicates it if it fails.*/
+/* Memory allocating function which prints an error message if it fails. */
 void *safeMalloc(int n) {
     void *p = malloc(n);
     if (p == NULL) {
@@ -35,9 +35,9 @@ void *safeMalloc(int n) {
     return p;
 }
 
-/* Expects a pointer to an array. 
- * Scans for n integers indicating the sizes of each block. Stores the blocksizes
- * at the location of the inputted pointer */
+/* Expects a pointer to an array. Scans for NUMBLOCK integers indicating 
+ * the sizes of each block. Stores the blocksizes at the location of the 
+ * inputted pointer. */
 void readBlocks(int **array) {
 	*array = safeMalloc(NUMBLOCKS * sizeof(int));
 	
@@ -115,6 +115,8 @@ void crossover(bool *chrom1, bool *chrom2) {
 	#endif
 }
 
+/* This function returns the height of the tower of the T set of
+ * chromosome if b == true, and that of the F set otherwise */
 int heightOfTower(bool *chromosome, bool b) {
 	int sum = 0;
 
@@ -127,28 +129,47 @@ int heightOfTower(bool *chromosome, bool b) {
 	return sum;
 }
 
+/* Returns the difference in height between two stacks formed by a chromosome */
+// Misschien heightOfTower en heightDifference samenvoegen??
+int heightDifference(bool *chromosome) {
+	int sum = 0;
+	sum += heightOfTower(chromosome, 0);
+	sum -= heightOfTower(chromosome, 1);
+	return (sum >= 0 ? sum : -sum);
+}
+
 int main(int argc, char *argv[]) {
 	readBlocks(&blocks);
 
 	srand(time(NULL));
 	
-	bool *testChrom1, *testChrom2;
-	testChrom1 = createChromosome(CHROMLENGTH);
-	testChrom2 = createChromosome(CHROMLENGTH);
-
-	crossover(testChrom1, testChrom2);
+	bool **generation;
+	generation = safeMalloc(POPSIZE * sizeof(bool *));
+	for (int i = 0; i < POPSIZE; i++) {
+		generation[i] = createChromosome(CHROMLENGTH);
+	}
 	
 	#ifndef NDEBUG
 		// Print blocksizes and chromosome for later debugging
 		printf("\n\nArray contents:\n---------------\n");
 		printArray(blocks, NUMBLOCKS);
-		printBoolArray(testChrom1, CHROMLENGTH);
-		printBoolArray(testChrom2, CHROMLENGTH);
+		for (int i = 0; i < POPSIZE; i++) {
+			printBoolArray(generation[i], CHROMLENGTH);
+		}
+		
+		printf("\n\nCrossing over gene 0 and 1:\n");
+		crossover(generation[0], generation[1]);
+		for (int i = 0; i < POPSIZE; i++) {
+			printBoolArray(generation[i], CHROMLENGTH);
+		}
 	#endif
 
+	// Memory cleanup
 	free(blocks);
-	free(testChrom1);
-	free(testChrom2);
+	for (int i = 0; i < POPSIZE; i++) {
+		free(generation[i]);
+	}
+	free(generation);
 
 	return 0;
 }
