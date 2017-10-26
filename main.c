@@ -25,6 +25,9 @@
 // The array of blocks
 int *blocks;
 
+// The generation of chromosomes
+bool **generation;
+
 /* Memory allocating function which prints an error message if it fails. */
 void *safeMalloc(int n) {
     void *p = malloc(n);
@@ -138,12 +141,22 @@ int heightDifference(bool *chromosome) {
 	return (sum >= 0 ? sum : -sum);
 }
 
+void getSmallestDifference(int *index, int *smallestDif) {
+	int diff;
+	for (int i = 0; i < POPSIZE; i++) {
+		diff = heightDifference(generation[i]);
+		if (diff < *smallestDif) {
+			*smallestDif = diff;
+			*index = i;
+		}
+	}
+}
+
 int main(int argc, char *argv[]) {
 	readBlocks(&blocks);
 
 	srand(time(NULL));
 	
-	bool **generation;
 	generation = safeMalloc(POPSIZE * sizeof(bool *));
 	for (int i = 0; i < POPSIZE; i++) {
 		generation[i] = createChromosome(CHROMLENGTH);
@@ -163,7 +176,19 @@ int main(int argc, char *argv[]) {
 			printBoolArray(generation[i], CHROMLENGTH);
 		}
 	#endif
-
+	
+	int nGen = 0, bestChromIndex, smallestDiff = 99999;
+	while (smallestDiff > 10 && nGen < 20) {
+		// Make new generation
+		
+		// Perform selection
+		
+		getSmallestDifference(&bestChromIndex, &smallestDiff);
+		nGen++; // Keep track of the generation number.
+	}
+	
+	printf("Generation: %d\n", nGen);
+	
 	// Memory cleanup
 	free(blocks);
 	for (int i = 0; i < POPSIZE; i++) {
