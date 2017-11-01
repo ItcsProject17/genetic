@@ -13,21 +13,13 @@
 #include <assert.h>
 
 #ifndef NDEBUG
-	// No double negations for debug code.
-	#define DEBUG
+	#define DEBUG             // No double negations for debug code.
 #endif
 
-// Number of blocks in the input set.
-#define NUMBLOCKS 5
-
-// Length of chromosome.
-#define CHROMLENGTH NUMBLOCKS
-
-// Number of chromosomes in population.
-#define POPSIZE 10
-
-// The 1 in x chance that mutation occurs for chromosomes.
-#define MUTATION_RATE 20
+#define NUMBLOCKS 5           // Number of blocks in the input set.
+#define CHROMLENGTH NUMBLOCKS // Length of chromosome.
+#define POPSIZE 10            // Number of chromosomes in population.
+#define MUTATION_RATE 20      // The 1 in x chance that mutation occurs for chromosomes.
 
 // The array of blocks.
 int *blocks;
@@ -60,7 +52,7 @@ void readBlocks(int **array) {
 /* Returns a pointer to an array filled with random booleans. */
 bool *createChromosome() {
 	bool *chromosome;
-	chromosome = safeMalloc(CHROMLENGTH * sizeof(int));
+	chromosome = safeMalloc(CHROMLENGTH * sizeof(bool));
 	
 	for (int i=0; i < CHROMLENGTH; i++) {
 		chromosome[i] = rand() > RAND_MAX / 2; // Random boolean.
@@ -138,7 +130,9 @@ int heightOfTower(bool *chromosome, bool b) {
 	// Add the value behind the index of blocks, if the value behind
 	// the index in chromosome == b.
 	for (int i = 0; i < CHROMLENGTH; i++) {
-		if (chromosome[i] == b) sum += blocks[i];
+		if (chromosome[i] == b) {
+			sum += blocks[i];
+		}
 	}
 
 	return sum;
@@ -148,10 +142,9 @@ int heightOfTower(bool *chromosome, bool b) {
  * Returns the difference in height between two stacks formed by a chromosome
  */
 int heightDifference(bool *chromosome) {
-	int sum = 0;
-	sum += heightOfTower(chromosome, 0);
-	sum -= heightOfTower(chromosome, 1);
-	return (sum >= 0 ? sum : -sum);
+	int difference = heightOfTower(chromosome, true) - heightOfTower(chromosome, false);
+
+	return difference > 0 ? difference : -difference;
 }
 
 void getSmallestDifference(int *index, int *smallestDif) {
@@ -184,13 +177,15 @@ void changeGeneration(bool **generation) {
 }
 
 int compareChromosomes(const void *pa, const void *pb) {
-	bool *chromA = (bool *) pa;
-	bool *chromB = (bool *) pb;
+	bool **chromA = (bool **) pa;
+	bool **chromB = (bool **) pb;
+
+	// chromA and chromB are pointers to the array (so pointer to a pointer)
 
 	// Return a negative number if a < b.
 	// Return 0 if a == b.
 	// Return a positive number if a > b.
-	return heightDifference(chromA) - heightDifference(chromB);
+	return heightDifference(*chromA) - heightDifference(*chromB);
 }
 
 int main(int argc, char *argv[]) {
@@ -211,10 +206,10 @@ int main(int argc, char *argv[]) {
 	// nGen represents the generation number.
 	int nGen = 0, smallestDiff = 99999;
 
-	while (smallestDiff > 10 && nGen < 200) {
+	while (smallestDiff > 10 && nGen < 20) {
 		// Sort our generation according to the distance in the blocks.
 		// This puts the most succesful chromosome at position 0.
-		qsort(generation, POPSIZE, sizeof(generation[0]), compareChromosomes);
+		qsort(generation, POPSIZE, sizeof(bool *), compareChromosomes);
 
 		// Save the best chromosome.
 		int smallestGenerationDifference = heightDifference(generation[0]);
@@ -271,7 +266,6 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < POPSIZE; i++) {
 		free(generation[i]);
 	}
-	free(generation);
 
 	return 0;
 }
