@@ -98,7 +98,8 @@ void mutate(bool *chromosome) {
 void crossover(bool *chrom1, bool *chrom2) {
 	// Pick a random index that is between the start and the end.
 	int index = 1 + (rand() % (CHROMLENGTH - 1));
-
+	
+	/*
 	#ifdef DEBUG
 		printf("[crossover] index chosen: %d\n", index);
 		printf("[crossover] before 1:\n");
@@ -106,6 +107,7 @@ void crossover(bool *chrom1, bool *chrom2) {
 		printf("[crossover] before 2:\n");
 		printBoolArray(chrom2, CHROMLENGTH);
 	#endif
+	*/
 
 	// Swap genes at all indeces before this random index.
 	for (int i = 0; i < index; i++) {
@@ -113,7 +115,8 @@ void crossover(bool *chrom1, bool *chrom2) {
 		chrom1[i] = chrom2[i];
 		chrom2[i] = temp;
 	}
-
+	
+	/*
 	#ifdef DEBUG
 		printf("-----------------\n");
 		printf("[crossover] after 1:\n");
@@ -121,6 +124,8 @@ void crossover(bool *chrom1, bool *chrom2) {
 		printf("[crossover] after 2:\n");
 		printBoolArray(chrom2, CHROMLENGTH);
 	#endif
+	*/
+	
 }
 
 /**
@@ -217,7 +222,28 @@ int main(int argc, char *argv[]) {
 			memcpy(bestChromosome, generation[0], sizeof(bestChromosome));
 			smallestDiff = smallestGenerationDifference;
 		}
-
+		
+		#ifdef DEBUG
+		printf("\nGeneration %d:\n", nGen);
+		printf("chr\n");
+		for (int i = 0; i < POPSIZE; i++) {
+			printf("%d\tT1: ", i);
+			for (int j = 0; j < CHROMLENGTH; j++) {
+				if (generation[i][j]) {
+					printf("%d ", blocks[j]);
+				}
+			}
+			printf("\t\t\tT2: ");
+			for (int j = 0; j < CHROMLENGTH; j++) {
+				if (! generation[i][j]) {
+					printf("%d ", blocks[j]);
+				}
+			}
+			printf("\tdiff: %d\n", heightDifference(generation[i]));
+		}
+		#endif
+		
+		changeGeneration(generation);
 		nGen++;
 	}
 	
