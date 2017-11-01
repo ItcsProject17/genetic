@@ -163,8 +163,8 @@ void changeGeneration(bool **generation) {
 	// The first 2 chromosomes are our best ones. We keep those unchanged.
 	// The last 2 chromosomes are not good. We replace them with
 	// crossed-over versions of the first 2 chromosomes.
-	generation[POPSIZE - 2] = generation[0];
-	generation[POPSIZE - 1] = generation[1];
+	memcpy(generation[POPSIZE - 2], generation[0], CHROMLENGTH * sizeof(bool));
+	memcpy(generation[POPSIZE - 1], generation[1], CHROMLENGTH * sizeof(bool));
 	crossover(generation[POPSIZE - 2], generation[POPSIZE - 1]);
 
 	// As for every chromosome in between, there will be
