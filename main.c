@@ -16,16 +16,19 @@
 	#define DEBUG             // No double negations for debug code.
 #endif
 
-#define NUMBLOCKS 5           // Number of blocks in the input set.
+#define NUMBLOCKS 10           // Number of blocks in the input set.
 #define CHROMLENGTH NUMBLOCKS // Length of chromosome.
-#define POPSIZE 10            // Number of chromosomes in population.
-#define MUTATION_RATE 20      // The 1 in x chance that mutation occurs for chromosomes.
+#define POPSIZE 30            // Number of chromosomes in population.
+#define MUTATION_RATE 8      // The 1 in x chance that mutation occurs for chromosomes.
 
 // The array of blocks.
 int *blocks;
 
 // The generation of chromosomes.
 bool **generation;
+
+// The amount of point mutations and crossovers that took place.
+int nMutations = 0, nCrossovers = 0;
 
 /* Memory allocating function which prints an error message if it fails. */
 void *safeMalloc(size_t n) {
@@ -85,6 +88,8 @@ void mutate(bool *chromosome) {
 
 	// Flip the bit at a random index.
 	chromosome[index] = ! chromosome[index];
+	
+	nMutations++;
 }
 
 void crossover(bool *chrom1, bool *chrom2) {
@@ -107,6 +112,8 @@ void crossover(bool *chrom1, bool *chrom2) {
 		chrom1[i] = chrom2[i];
 		chrom2[i] = temp;
 	}
+	
+	nCrossovers++;
 	
 	/*
 	#ifdef DEBUG
@@ -166,10 +173,19 @@ void changeGeneration(bool **generation) {
 	memcpy(generation[POPSIZE - 2], generation[0], CHROMLENGTH * sizeof(bool));
 	memcpy(generation[POPSIZE - 1], generation[1], CHROMLENGTH * sizeof(bool));
 	crossover(generation[POPSIZE - 2], generation[POPSIZE - 1]);
-
-	// As for every chromosome in between, there will be
-	// a 1 in MUTATION_RATE chance for mutation.
-	for (int i = 2; i < POPSIZE - 2; i++) {
+	
+	// For every chromosome except the first two, there will be a 1 in
+	// (MUTATION_RATE * 2) chance for crossover with a random other
+	// chromosome (except the first two).
+	for (int i = 2; i < POPSIZE; i++) {
+		if (rand() <= RAND_MAX / (MUTATION_RATE * 2)) {
+			crossover(generation[i], generation[ rand() % (POPSIZE - 2) + 2 ]);
+		}
+	}
+	
+	// For every chromosome except the first two, there will be
+	// a 1 in MUTATION_RATE chance for point mutation.
+	for (int i = 2; i < POPSIZE; i++) {
 		if (rand() <= RAND_MAX / MUTATION_RATE) {
 			mutate(generation[i]);
 		}
@@ -204,9 +220,9 @@ int main(int argc, char *argv[]) {
 	bool bestChromosome[CHROMLENGTH];
 
 	// nGen represents the generation number.
-	int nGen = 0, smallestDiff = 99999;
+	int nGen = 0, smallestDiff = 99999, noProgressCount = 0, foundBestAt;
 
-	while (smallestDiff > 10 && nGen < 20) {
+	while (smallestDiff > 0 && nGen < 3000 && noProgressCount < 500) {
 		// Sort our generation according to the distance in the blocks.
 		// This puts the most succesful chromosome at position 0.
 		qsort(generation, POPSIZE, sizeof(bool *), compareChromosomes);
@@ -214,6 +230,8 @@ int main(int argc, char *argv[]) {
 		// Save the best chromosome.
 		int smallestGenerationDifference = heightDifference(generation[0]);
 		if (smallestGenerationDifference < smallestDiff) {
+			foundBestAt = nGen;
+			noProgressCount = 0;
 			memcpy(bestChromosome, generation[0], sizeof(bestChromosome));
 			smallestDiff = smallestGenerationDifference;
 		}
@@ -240,6 +258,7 @@ int main(int argc, char *argv[]) {
 		
 		changeGeneration(generation);
 		nGen++;
+		noProgressCount++;
 	}
 	
 	printBoolArray(bestChromosome, CHROMLENGTH);
@@ -259,7 +278,9 @@ int main(int argc, char *argv[]) {
 			printf("%d ", blocks[i]);
 		}
 	}
-	printf("\n");
+	printf("\nHeight Difference: %d\n", heightDifference(bestChromosome));
+	printf("Number of point mutations: %d\t Number of crossovers: %d\n", nMutations, nCrossovers);
+	printf("Found best option at generation %d\n", foundBestAt);
 
 	// Memory cleanup.
 	free(blocks);
