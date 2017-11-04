@@ -20,6 +20,7 @@
 #define CHROMLENGTH NUMBLOCKS // Length of chromosome.
 #define POPSIZE 30            // Number of chromosomes in population.
 #define MUTATION_RATE 8      // The 1 in x chance that mutation occurs for chromosomes.
+#define NO_PROGRESS_ALLOWED 800 // The number of generations without progress are allowed before program termination.
 
 // The array of blocks.
 int *blocks;
@@ -222,7 +223,7 @@ int main(int argc, char *argv[]) {
 	// nGen represents the generation number.
 	int nGen = 0, smallestDiff = 99999, noProgressCount = 0, foundBestAt;
 
-	while (smallestDiff > 0 && nGen < 3000 && noProgressCount < 800) {
+	while (smallestDiff > 0 && nGen < 3000 && noProgressCount < NO_PROGRESS_ALLOWED) {
 		// Sort our generation according to the distance in the blocks.
 		// This puts the most succesful chromosome at position 0.
 		qsort(generation, POPSIZE, sizeof(bool *), compareChromosomes);
