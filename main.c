@@ -75,7 +75,7 @@ void printArray(int *array, int length) {
 
 /* Prints the contents of a boolean array. */
 void printBoolArray(bool *array, int length) {
-	printf("boolean array:\n");
+	printf("boolean array:\t");
 	for (bool *b = array; b < array + length; b++) {
 		printf("%d ", *b);
 	}
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
 	// nGen represents the generation number.
 	int nGen = 0, smallestDiff = 99999, noProgressCount = 0, foundBestAt;
 
-	while (smallestDiff > 0 && nGen < 3000 && noProgressCount < 500) {
+	while (smallestDiff > 0 && nGen < 3000 && noProgressCount < 800) {
 		// Sort our generation according to the distance in the blocks.
 		// This puts the most succesful chromosome at position 0.
 		qsort(generation, POPSIZE, sizeof(bool *), compareChromosomes);
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 	printBoolArray(bestChromosome, CHROMLENGTH);
 
 	// Output the best result.
-	printf("Tower 1:\n");
+	printf("Tower 1:\t");
 	for (int i = 0; i < CHROMLENGTH; i++) {
 		if (bestChromosome[i]) {
 			printf("%d ", blocks[i]);
@@ -272,15 +272,15 @@ int main(int argc, char *argv[]) {
 	}
 	printf("\n");
 
-	printf("Tower 2:\n");
+	printf("Tower 2:\t");
 	for (int i = 0; i < CHROMLENGTH; i++) {
 		if (! bestChromosome[i]) {
 			printf("%d ", blocks[i]);
 		}
 	}
-	printf("\nHeight Difference: %d\n", heightDifference(bestChromosome));
-	printf("Number of point mutations: %d\t Number of crossovers: %d\n", nMutations, nCrossovers);
-	printf("Found best option at generation %d\n", foundBestAt);
+	printf("\n\nHeight Difference:\t\t %d\n", heightDifference(bestChromosome));
+	printf("Number of point mutations:\t %d\nNumber of crossovers:\t\t %d\n", nMutations, nCrossovers);
+	printf("Found best option at generation: %d\n", foundBestAt);
 
 	// Memory cleanup.
 	free(blocks);
